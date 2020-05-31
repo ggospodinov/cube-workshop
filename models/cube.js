@@ -1,9 +1,7 @@
 
 const { v4 } = require('uuid');
-const fs = require('fs')
-const path = require('path')
+const {saveGube}=require('../controllers/database')
 
-const databaseFile = path.join(__dirname, '..', 'config/database.json');
 
 
 class Cube {
@@ -22,28 +20,12 @@ class Cube {
             description: this.description,
             imageUrl: this.imageUrl,
             difficulty: this.difficulty
-        }
-
-        fs.readFile(databaseFile, (error, dbData) => {
-            if (error) {
-                throw error
-            }
-
-            const cubes= JSON.parse(dbData);
-           
-            cubes.push(NEWCube)
-
-
-            fs.writeFile(databaseFile, JSON.stringify(cubes), error => {
-                if (error) {
-                    throw error
-                }
-
-                console.log("New cube is seccessfully stored")
-            })
-        })
-
+        } 
+        
+        saveGube(NEWCube)
     }
+
+    
 }
 
 module.exports = Cube

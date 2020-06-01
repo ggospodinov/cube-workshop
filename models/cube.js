@@ -1,49 +1,26 @@
-
-const { v4 } = require('uuid');
-const fs = require('fs')
-const path = require('path')
-
-const databaseFile = path.join(__dirname, '..', 'config/database.json');
-
+const { v4 } = require('uuid')
+const { saveCube } = require('../controllers/database')
 
 class Cube {
-    constructor(name, description, imageUrl, difficulty) {
-        this.id = v4(),
-            this.name = name || "NoName",
-            this.description = description,
-            this.imageUrl = imageUrl || "placeholder",
-            this.difficulty = difficulty || 0
+  constructor(name, description, imageUrl, difficulty) {
+    this.id = v4()
+    this.name = name || "No Name"
+    this.description = description 
+    this.imageUrl = imageUrl || "placeholder"
+    this.difficulty = difficulty || 0
+  }
+
+  // saveCube
+  save(callback) {
+    const newCube = {
+      id: this.id,
+      name: this.name,
+      description: this.description,
+      imageUrl: this.imageUrl,
+      difficulty: this.difficulty,
     }
-
-    save() {
-        const NEWCube = {
-            id: this.id,
-            name: this.name,
-            description: this.description,
-            imageUrl: this.imageUrl,
-            difficulty: this.difficulty
-        }
-
-        fs.readFile(databaseFile, (error, dbData) => {
-            if (error) {
-                throw error
-            }
-
-            const cubes= JSON.parse(dbData);
-           
-            cubes.push(NEWCube)
-
-
-            fs.writeFile(databaseFile, JSON.stringify(cubes), error => {
-                if (error) {
-                    throw error
-                }
-
-                console.log("New cube is seccessfully stored")
-            })
-        })
-
-    }
+    saveCube(newCube, callback)
+  }
 }
 
 module.exports = Cube

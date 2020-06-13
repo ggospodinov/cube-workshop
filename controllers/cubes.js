@@ -16,8 +16,7 @@ const getCube = async (id) => {
 
 const getCubeWithAccessories = async (id) => {
   const cube = await Cube.findById(id).populate('accessories').lean()
-  console.log(cube)
-  return cube
+   return cube
 }
 
 const updateCube = async (cubeId, accessoryId) => {

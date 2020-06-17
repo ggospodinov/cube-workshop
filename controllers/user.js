@@ -1,12 +1,14 @@
-const jwt = require('jsonwebtoken')
-const User = require('../models/user')
-const bcrypt = require('bcrypt')
+const env = process.env.NODE_ENV || 'development'
 
-const privateKey = "CUBE-WORKSHOP-SORTUNI"
+const jwt = require('jsonwebtoken')
+const config = require('../config/config')[env]
+const bcrypt = require('bcrypt')
+const User = require('../models/user')
+
 
 
 const generateToken = data => {
-    const token = jwt.sign(data, privateKey)
+    const token = jwt.sign(data, config.privateKey)
   
     return token
   }
@@ -64,9 +66,73 @@ const verifyUser = async (req, res) => {
   }
 
 
+  const authAccess = (req, res, next) => {
+    const token = req.cookies['aid']
+    if (!token) {
+      return res.redirect('/')
+    }
+    
+    try {
+      jwt.verify(token, config.privateKey)
+      next()
+    } catch(e) {
+      return res.redirect('/')
+    }
+  }
+
+
+  const authAccessJSON = (req, res, next) => {
+    const token = req.cookies['aid']
+    if (!token) {
+      return res.json({
+        error: "Not authenticated"
+      })
+    }
+    
+    try {
+      jwt.verify(token, config.privateKey)
+      next()
+    } catch(e) {
+      return res.json({
+        error: "Not authenticated"
+      })
+    }
+  }
+
+
+  const guestAccess = (req, res, next) => {
+    const token = req.cookies['aid']
+    if (token) {
+      return res.redirect('/')
+    }
+    next()
+  }
+
+  const getUserStatus = (req, res, next) => {
+    const token = req.cookies['aid']
+    if (!token) {
+      req.isLoggedIn = false
+    }
+    
+    try {
+      jwt.verify(token, config.privateKey)
+      req.isLoggedIn = true
+    } catch(e) {
+      req.isLoggedIn = false
+    }
+  
+    next()
+  }
+  
+
+
 
 
 module.exports = {
     saveUser,
-    verifyUser
+    authAccess,
+    verifyUser,
+    guestAccess,
+    getUserStatus,
+    authAccessJSON
 }

@@ -1,6 +1,8 @@
+require('dotenv').config()
 const env = process.env.NODE_ENV || 'development';
 const mongoose = require('mongoose')
 const config = require('./config/config')[env];
+
 
 const express = require('express');
 const indexRouter = require('./routes')
@@ -10,10 +12,11 @@ const accessoryRouter=require('./routes/accessory.js')
 const app = express();
 
 
-const url=`mongodb+srv://user:softuni@softuni-ivota.mongodb.net/<cubecle>?retryWrites=true&w=majority`
-mongoose.connect(url, {
+
+mongoose.connect(config.databaseUrl, {
     useNewUrlParser: true,
-    useUnifiedTopology: true
+    useUnifiedTopology: true,
+    useFindAndModify: false,
   })
   .then(() => {
     console.log('MongoDB Connected…')
@@ -26,6 +29,12 @@ app.use('/', authRouter);
 app.use('/', cubeRouter);
 app.use('/', accessoryRouter);
 app.use('/', indexRouter)
+
+app.get('*', (req, res) => {
+  res.render('404', {
+    title: 'Error | Cube Workshop'
+  })
+})
 
 
 app.listen(config.port, console.log(`Listening on port ${config.port}! Now its up to you...`));
